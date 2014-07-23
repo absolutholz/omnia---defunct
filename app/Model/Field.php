@@ -19,21 +19,24 @@ class Field extends AppModel {
 		)
 	);
 	
-	public function getGroupFieldsByCollectionID ($collection_id) {
-		$groups = Cache::read('groups_' . $collection_id);
+	public function getGroupsByCollectionID ($collection_id) {
+		$groups = Cache::read('groups_' . $collection_id, 'long');
 
         if (empty($groups)) {
-			$groups = $this->cacheGroupFieldsByCollectionID($collection_id);
+			$groups = $this->_cacheGroupsByCollectionID($collection_id);
 		}
 		
 		return $groups;
 	}
 	
-	public function cacheGroupFieldsByCollectionID ($collection_id) {
+	private function _cacheGroupsByCollectionID ($collection_id) {
 		$groups = $this->find('all', array("contain" => false, "conditions" => array("collection_id" => $collection_id, "is_groupable" => true)));		
-		$groups = Hash::combine($groups, '{n}.Field.id', '{n}.Field');
+		$groups = Hash::combine($groups, '{n}.Field.id', '{n}');
 
-		Cache::write('groups_' . $collection_id, $groups);
+		Cache::write('groups_' . $collection_id, $groups, 'long');
+		
+		$event = new CakeEvent('Group.change.on.' . $collection_id, $this, array());
+		CakeEventManager::instance()->dispatch($event);
 		
 		return $groups;
 	}

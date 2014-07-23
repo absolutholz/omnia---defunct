@@ -16,7 +16,12 @@ class CollectionItem extends AppModel {
         )
     );
 	
-	public $belongsTo = array('Collection', 'CollectionItemStatus', 'User');
+	public $belongsTo = array("Collection" => array(
+            "counterCache" => 'collection_item_count',
+            "counterScope" => array(
+              "CollectionItem.collection_item_status_id" => 1
+            )
+        ), 'CollectionItemStatus', 'User');
 	public $hasMany = array("CollectionItemField" => array("dependent" => true), 'Completion');
 
 	// HELPERS

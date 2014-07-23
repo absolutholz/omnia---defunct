@@ -17,6 +17,6 @@
 <form id="search" method="get" action="<?php echo Router::url(array("controller" => 'collections', "action" => 'search')); ?>" class="frm-search">
 		<label for="search_term">Search Term</label>
 		<input type="text" required="required" id="search_term" name="search_term">
-		<button>Search</button>
+		<button type="submit" class="btn">Search</button>
 		<a href="<?php echo Router::url(array("controller" => 'collections', "action" => 'search')); ?>" title="Perform a search with more custom options available">Extended Seach Options</a>
 </form>

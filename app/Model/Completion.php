@@ -12,7 +12,12 @@ class Completion extends AppModel {
         )
     );
 	
-	public $belongsTo = array('CollectionItem', 'CompletionStatus', 'Participation');
+	public $belongsTo = array('CollectionItem', 'CompletionStatus', "Participation" => array(
+            "counterCache" => 'completion_count',
+            "counterScope" => array(
+              "Completion.completion_status_id" => 3
+            )
+	));
 	
 	public function getCompletionsByParticipationID ($participation_id) {
 		$completions = Cache::read('completions_' . $participation_id);

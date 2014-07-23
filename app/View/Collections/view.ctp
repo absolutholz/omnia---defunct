@@ -9,6 +9,10 @@
 	$collection_id = $coll['id'];
 	$collection_name = $coll['name']; 
 	//$completion_count = $participation['Participation']['completion_count'];?>
+	
+	<?php 
+		echo $this->element('breadcrumbs', array("crmbs" => array())); 
+	?>
 
 	<h1><?php echo $collection_name; ?></h1>
 	<h2><?php echo $coll['description']; ?></h2>
@@ -42,7 +46,7 @@
 	</ul>
 </section>
 	
-<ol class="tsrs list-cards">
+<ol class="tsrs">
 	<?php foreach ($collection['CollectionItems'] as $collection_item): ?>
 		<li><?php echo $this->element('teasers/collection_item', array("collection_item" => $collection_item, "collection" => $collection)); ?></li>
 	<?php endforeach; ?>

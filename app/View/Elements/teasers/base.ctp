@@ -1,8 +1,7 @@
-<section class="tsr">
-	<a href="<?php echo $href; ?>" title="<?php echo $title; ?>">
-		<h1><?php echo $name; ?></h1>
+<section class="tsr tsr-<?php echo $this->fetch('tsr-type') . ' ' . $this->fetch('class'); ?>">
+	<a href="<?php echo $this->fetch('tsr-url'); ?>" title="<?php echo $this->fetch('tsr-title'); ?>">
+		<h1><?php echo $this->fetch('tsr-maintext'); ?></h1>
+		<?php echo $this->fetch('content'); ?>
 	</a>
-	<?php if (isset($actions) && !empty($actions)) {
-		echo $this->element('actions', array("actions" => $actions)); 
-	} ?>
+	<?php echo $this->fetch('tsr-actions'); ?>
 </section>

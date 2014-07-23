@@ -16,7 +16,8 @@
 		?>
     </fieldset>
 <?php echo $this->Form->input('rememberMe', array('type' => 'checkbox', 'label' => 'Remember me')); ?>
-<?php echo $this->Form->end(__('Login')); ?>
+<button type="submit" class="btn">Login</button>
+<?php echo $this->Form->end(); ?>
 
 <footer>
 	<div class="divider"><span>or</span></div>

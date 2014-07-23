@@ -25,5 +25,8 @@
 		<?php echo $this->element('footer'); ?>
 		</footer>
 
+		<script src="js/zepto.js"></script>
+		<script src="js/main.js"></script>
+		
     </body>
 </html>

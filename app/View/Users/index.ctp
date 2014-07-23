@@ -21,17 +21,9 @@
 <ul class="list-cards">
     <?php foreach ($users as $user): ?>
     <li>
-		<section class="card">
-			<a href="<?php echo Router::url(array("controller" => 'users', "action" => 'view', "user_id" => $user['User']['id'])); ?>" title="View this user's information">
-				<h1><?php echo $user['User']['username'] ?></h1>
-			</a>
-			<!--ul class="actions">
-				<li><a href="<?php echo Router::url(array("controller" => 'users', "action" => 'view', "user_id" => $user['User']['id'])); ?>" title="View this user's information">View</a></li>
-				<?php if ($authUser['id'] == $user['User']['id'] || $authUser['role_id'] == 3) { ?>
-				<li><a href="<?php echo Router::url(array("controller" => 'users', "action" => 'edit', "user_id" => $user['User']['id'])); ?>" title="Edit this user's information">Edit</a></li>
-				<?php } ?>
-			</ul-->
-		</section>
+	
+		<?php echo $this->element('teasers/user', array("user" => $user)); ?>
+	
     </li>
     <?php endforeach; ?>
 </ul>

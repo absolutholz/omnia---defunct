@@ -90,7 +90,8 @@ foreach ($collection['Field'] as $key => $field):
 		default:
 			echo $this->Form->input('CollectionItemField.' . $key . '.value', array("label" => $field['name']));
 	}
-endforeach;
+endforeach; ?>
 
-echo $this->Form->end('Save');
-?>
+<button type="submit" class="btn">Save</button>
+
+<?php echo $this->Form->end(); ?>

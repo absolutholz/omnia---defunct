@@ -8,7 +8,7 @@
 	$completion_status = isset($completion['Completion']['completion_status_id']) ? $completion['Completion']['Completion']['completion_status_id'] : 1; // default = incomplete
 ?>
 
-<header class="card">
+<header>
 	<?php 
 		echo $this->element('breadcrumbs', array("crmbs" => array(
 			array("href" => Router::url(array("controller" => 'collections', "action" => 'view', "collection_id" => $collection_id, "#" => $item_id)), "text" => $collection['Collection']['name'], "title" => $collection['Collection']['name']),
@@ -26,18 +26,25 @@
 		
 	<menu class="actions">		
 		<ul>
-			<li><a href="<?php echo Router::url(array("controller" => 'collection_items', "action" => 'edit', "collection_id" => $collection_id, "collection_item_id" => $item_id)); ?>" title="Edit <?php echo $collection_item['CollectionItem']['name']; ?>">Edit</a></li>
+			<li><a 
+				href="<?php echo Router::url(array("controller" => 'collection_items', "action" => 'edit', "collection_id" => $collection_id, "collection_item_id" => $item_id)); ?>" 
+				title="Edit <?php echo $collection_item['CollectionItem']['name']; ?>">Edit</a></li>
 			<!-- TODO: not cached, admin or creator feature only -->
-			<li><a href="<?php echo Router::url(array("controller" => 'collection_items', "action" => 'delete', "collection_id" => $collection_id, "collection_item_id" => $item_id)); ?>" title="Delete <?php echo $collection_item['CollectionItem']['name']; ?>">Delete</a></li>
+			<li><a 
+				href="<?php echo Router::url(array("controller" => 'collection_items', "action" => 'delete', "collection_id" => $collection_id, "collection_item_id" => $item_id)); ?>" 
+				title="Delete <?php echo $collection_item['CollectionItem']['name']; ?>">Delete</a></li>
 		</ul>
 	</menu>	
 </header>
 
-<menu class="actions">
-	<ul class="btn-bar">
+<menu>
+	<ul class="btn-group">
 		<!-- TODO: not cached -->
 		<?php foreach (array_reverse($status_completion, true) as $status_id => $status_name) { ?>
-		<li><a href="<?php echo Router::url(array("controller" => 'collection_items', "action" => 'complete', "collection_id" => $collection_id, "collection_item_id" => $item_id, "status_id" => $status_id)); ?>" title="Mark as <?php echo $status_name; ?>" class="btn<?php if ($completion_status == $status_id) { echo ' s-active'; } ?>"><?php echo $status_name; ?></a></li>
+		<li><a 
+			href="<?php echo Router::url(array("controller" => 'collection_items', "action" => 'complete', "collection_id" => $collection_id, "collection_item_id" => $item_id, "status_id" => $status_id)); ?>" 
+			title="Mark as <?php echo $status_name; ?>" 
+			class="btn <?php if ($status_id == 3) { echo 'btn-positive'; } elseif ($status_id == 1) { echo 'btn-negative';} if ($completion_status == $status_id) { echo ' s-active'; } ?>"><?php echo $status_name; ?></a></li>
 		<?php } ?>
 	</ul>
 </menu>
@@ -96,15 +103,24 @@
 	<?php } ?>
 </dl>
 
-<menu class="actions">
-	<ul class="btn-bar">
-		<li><a href="<?php echo Router::url(array('controller' => 'collection_items', 'action' => 'available', 'collection_id' => $collection_id, 'collection_item_id' => $item_id, 'status_id' => 1)); ?>" title="Mark as Available" class=" btn<?php if ($item_status == 1) { echo ' s-active'; } ?>">Available</a></li>
-		<li><a href="<?php echo Router::url(array('controller' => 'collection_items', 'action' => 'available', 'collection_id' => $collection_id, 'collection_item_id' => $item_id, 'status_id' => 2)); ?>" title="Mark as Limited" class=" btn<?php if ($item_status == 2) { echo ' s-active'; } ?>">Limited</a></li>
-		<li><a href="<?php echo Router::url(array('controller' => 'collection_items', 'action' => 'available', 'collection_id' => $collection_id, 'collection_item_id' => $item_id, 'status_id' => 3)); ?>" title="Mark as Defunct" class=" btn<?php if ($item_status == 3) { echo ' s-active'; } ?>">Defunct</a></li>
+<menu>
+	<ul class="btn-group">
+		<li><a
+			href="<?php echo Router::url(array('controller' => 'collection_items', 'action' => 'available', 'collection_id' => $collection_id, 'collection_item_id' => $item_id, 'status_id' => 1)); ?>" 
+			title="Mark as Available" 
+			class="btn btn-positive<?php if ($item_status == 1) { echo ' s-active'; } ?>">Available</a></li>
+		<li><a 
+			href="<?php echo Router::url(array('controller' => 'collection_items', 'action' => 'available', 'collection_id' => $collection_id, 'collection_item_id' => $item_id, 'status_id' => 2)); ?>" 
+			title="Mark as Limited" 
+			class="btn<?php if ($item_status == 2) { echo ' s-active'; } ?>">Limited</a></li>
+		<li><a 
+			href="<?php echo Router::url(array('controller' => 'collection_items', 'action' => 'available', 'collection_id' => $collection_id, 'collection_item_id' => $item_id, 'status_id' => 3)); ?>" 
+			title="Mark as Defunct" 
+			class="btn btn-negative<?php if ($item_status == 3) { echo ' s-active'; } ?>">Defunct</a></li>
 	</ul>
 </menu>
 
-<footer class="stripe">
+<footer>
 	<p>Created on: <time datetime="<?php echo $collection_item['CollectionItem']['created']; ?>"><?php $date = date_create($collection_item['CollectionItem']['created']); echo date_format($date, 'd.m.Y H:i:s'); ?></time></p>
 	<?php if (isset($collection_item['CollectionItem']['modified'])) { ?>
 	<p>Last modified on: <time datetime="<?php echo $collection_item['CollectionItem']['modified']; ?>"><?php $date = date_create($collection_item['CollectionItem']['modified']); echo date_format($date, 'd.m.Y H:i:s'); ?></time></p>

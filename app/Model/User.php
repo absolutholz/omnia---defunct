@@ -6,8 +6,17 @@ class User extends AppModel {
 	const DETAIL_LEVEL_EXTENDED = 2;
 
     public $validate = array(
-        'username' => array(
-            'rule' => 'notEmpty'
+        "username" => array(
+			"input" => array(
+				"rule" => 'notEmpty',
+				"required" => true
+			),
+			"input2" => array(
+				"rule" => 'alphaNumeric'
+			),
+			"uniqueness" => array(
+				"rule" => 'isUnique'
+			)
         ),
         'password' => array(
             'rule' => 'notEmpty'
@@ -33,11 +42,11 @@ class User extends AppModel {
 	
 	public function isValid ($user_id) {
 		if (!$user_id) {
-			throw new NotFoundException(__('Invalid User ID'));
+			//throw new NotFoundException(__('Invalid User ID'));
 			return false;
 			
-		} else if (!$this->getByID($user_id)) {
-			throw new NotFoundException(__('Invalid User'));
+		} else if (!isset($this->getAllUsers()[$user_id])) {
+			//throw new NotFoundException(__('Invalid User'));
 			return false;
 		}
 

@@ -3,7 +3,7 @@
 	$this->assign('page', 'collectionitem_create');
 ?>
 
-<header class="stripe">
+<header>
 	<?php 
 		echo $this->element('breadcrumbs', array("crmbs" => array(
 			array("href" => Router::url(array("controller" => 'collections', "action" => 'view', "collection_id" => $collection['Collection']['id'])), "text" => $collection['Collection']['name'], "title" => $collection['Collection']['name'])
@@ -43,7 +43,8 @@ foreach ($collection['Field'] as $field):
 		echo $this->Form->input('CollectionItemField.' . $iter . '.field_id', array("type" => 'hidden', "value" => $field['id']));
 
 	$iter++;
-endforeach;
+endforeach; ?>
 
-echo $this->Form->end('Create');
-?>
+<button type="submit" class="btn">Create</button>
+
+<?php echo $this->Form->end(false); ?>
