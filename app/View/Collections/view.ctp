@@ -47,11 +47,33 @@
 </section>
 	
 <ol class="tsrs">
+<?php if (!empty($collection['CollectionItems']['Groups'])) { ?>
+
+	<?php foreach ($collection['CollectionItems']['Groups'] as $key => $group): if ($key != 'UNGROUPED'): ?>
+	<li><?php echo $this->element('teasers/group', array("group" => $group, "group_id" => $key, "collection" => $collection, "grouped_by_id" => $grouped_by_id));
+	if ($open_group_id == $key): ?>
+
+	<ol>
+		<?php foreach ($group as $collection_item): ?>
+		<li><?php echo $this->element('teasers/collection_item', array("collection_item" => $collection_item, "collection" => $collection)); ?></li>
+		<?php endforeach; ?>
+	</ol>
+	
+	<?php endif; ?></li>	
+	<?php endif; endforeach; ?>
+
+	<?php foreach ($collection['CollectionItems']['Groups']['UNGROUPED'] as $collection_item): ?>
+		<li><?php echo $this->element('teasers/collection_item', array("collection_item" => $collection_item, "collection" => $collection)); ?></li>
+	<?php endforeach; ?>
+
+<?php } else { ?>
+
 	<?php foreach ($collection['CollectionItems'] as $collection_item): ?>
 		<li><?php echo $this->element('teasers/collection_item', array("collection_item" => $collection_item, "collection" => $collection)); ?></li>
 	<?php endforeach; ?>
-</ol>
 
+<?php } ?>
+</ol>
 	
 <footer class="stripe">
 	<p>Created on: <time datetime="<?php echo $collection['Collection']['created']; ?>"><?php $date = date_create($collection['Collection']['created']); echo date_format($date, 'd.m.Y H:i:s'); ?></time></p>

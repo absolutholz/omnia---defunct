@@ -56,43 +56,14 @@ class Collection extends AppModel {
 		return $this->User->isValid($check['user_id']);
 	}
 	
-	/**
-	 * Recache all collection information (used on create, update and delete)
-	 */
-	public function recache ($collection_id, $user_id, $public = true) {
-	var_dump($collection_id);
-		// if the collection is public, reset the public LIST cache
-		if ($public) {
-			$this->cacheAllPublic();
-		}
-		// reset the DETAILed collection cache
-		$this->cacheByID($collection_id);
-		// reset participation LIST cache(s)
-		$this->Participation->recacheByCollectionID($collection_id);
-	}
-	
 	// READ
 
 	/**
 	 * Get a list of all public collections.
 	 */
 	public function getAllPublic () {
-		$collections = Cache::read('collections_public', 'long');
-
-        if (empty($collections)) {
-			$collections = $this->cacheAllPublic();
-		}
-		
-		return $collections;
-	}
-	/**
-	 * Cache the list of public collections.
-	 */
-	public function cacheAllPublic () {
 		$collections = $this->find('all', array("contain" => false, "conditions" => array("Collection.visibility_id" => 1)));
 		$collections = Hash::combine($collections, '{n}.Collection.id', '{n}');
-
-		Cache::write('collections_public', $collections, 'long');
 		
 		return $collections;
 	}
@@ -131,30 +102,15 @@ class Collection extends AppModel {
 	 * returns Collection Array with Collection Information, Collection Items, Participations (including the current user), Fields and Groups
 	 */
 	public function getByID ($collection_id) {
-		$collection = Cache::read('collection_' . $collection_id, 'long');
-
-        if (empty($collection)) {
-			$collection = $this->cacheByID($collection_id);
-		}
+		$collection = $this->find('first', array("contain" => 'Field', "conditions" => array("Collection.id" => $collection_id)));
+		$collection['Field'] = Hash::combine($collection['Field'], '{n}.id', '{n}');
 		
 		// TODO: cache these values as part of the collection?
 		$participations = $this->Participation->getByCollectionID($collection_id);
-		$collection_items = $this->CollectionItem->getListByCollectionID($collection_id);
 		$groups = $this->Field->getGroupsByCollectionID($collection_id);
+		$collection_items = $this->CollectionItem->getListByCollectionID($collection_id, $groups);
 		
 		$collection = array_merge($collection, array("Participations" => $participations), array("CollectionItems" => $collection_items), array("Groups" => $groups));
-		
-		return $collection;
-	}
-	public function cacheByID ($collection_id) {
-		$collection = $this->find('first', array("contain" => 'Field', "conditions" => array("Collection.id" => $collection_id)));
-		$collection['Field'] = Hash::combine($collection['Field'], '{n}.id', '{n}');
-
-		if ($collection) {
-			Cache::write('collection_' . $collection_id, $collection, 'long');
-		} else {
-			Cache::delete('collection_' . $collection_id, 'long');
-		}
 		
 		return $collection;
 	}
@@ -172,8 +128,6 @@ class Collection extends AppModel {
 			$save_participation = $this->Participation->createParticipation($this->id, $data['Collection']['user_id'], $data['Collection']['visibility_id']);
 			if ($save_participation) {
 			
-				// new collection means that a public collection may be cached for listing, the details can be cached already, and a participation for the user
-				$this->recache($collection_id, $data['Collection']['visibility_id'] == 1);
 				return $data;
 				
 			} else {
@@ -195,12 +149,7 @@ class Collection extends AppModel {
 	// EDIT
 	public function updateCollection ($data) {
 		$save_collection = $this->save($data);
-		if ($save_collection) {
-
-			$this->recache($this->id, $data['Collection']['visibility_id'] == 1);
-
-		} else {
-		
+		if (!$save_collection) {
 			// could not save the collection, return the errors (validation)
 			return array("errors" => $this->validationErrors);
 		}
@@ -211,10 +160,6 @@ class Collection extends AppModel {
 	// DELETE
 	public function deleteCollection ($collection_id) {
 		if ($this->delete($collection_id, true)) {
-
-			// TODO: find out if the collection is public in order to set the second argument
-			$this->recache($collection_id, true);
-
 			return true;
 		}
 

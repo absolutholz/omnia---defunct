@@ -32,16 +32,6 @@ class CollectionItem extends AppModel {
 	 * Get a single Collection Item by it's ID
 	 */
 	public function getByID ($collection_item_id/*, $collection_id*/) {
-	Cache::clear();
-		$collection_item = Cache::read('collection_item_' . $collection_item_id);
-
-        if (empty($collection_item)) {
-			$collection_item = $this->cacheByID($collection_item_id/*, $collection_id*/);
-		}
-
-		return $collection_item;
-	}	
-	public function cacheByID ($collection_item_id/*, $collection_id = null*/) {
 		// GET collection_item, collection_item_fields, completions
 		// merge with collection on collection_item.collection_id and with participations on completion.participation_id 
 	
@@ -66,32 +56,14 @@ class CollectionItem extends AppModel {
 		//} else {
 			//$collection_item = $this->getListByCollectionID($collection_id)[$collection_item_id];
 		//}
-		
-		if (!empty($collection_item)) {
-			Cache::write('collection_item_' . $collection_item_id, $collection_item, 'long');
-		} else {
-			Cache::delete('collection_item_' . $collection_item_id);
-		}
-		
-		$event = new CakeEvent('CollectionItem.change.on.' . $collection_item_id, $this, array());
-		CakeEventManager::instance()->dispatch($event);
-		
+
 		return $collection_item;
-	}
+	}	
 	
 	/**
 	 * Get a list of Collection Items by their Collection ID
 	 */
-	public function getListByCollectionID ($collection_id) {
-		$collection_items = Cache::read('collection_items_' . $collection_id);
-
-        if (empty($collection_items)) {
-			$collection_items = $this->cacheListByCollectionID($collection_id);
-		}
-
-		return $collection_items;
-	}
-	public function cacheListByCollectionID ($collection_id) {
+	public function getListByCollectionID ($collection_id, $groups = null, $group_id = null) {
 		// TODO: join CompletionStatus.name and Field.name
 		$collection_items = $this->find('all', array("contain" => $this->_relations, "conditions" => array("CollectionItem.collection_id" => $collection_id), "order" => 'CollectionItem.name'));
 		$collection_items = Hash::combine($collection_items, '{n}.CollectionItem.id', '{n}');
@@ -99,17 +71,55 @@ class CollectionItem extends AppModel {
 		foreach ($collection_items as $key => $collection_item) {
 			$collection_items[$key]['CollectionItemField'] = Hash::combine($collection_item['CollectionItemField'], '{n}.field_id', '{n}');
 		}
+		
+		// if this collection has groups
+		if ($groups) {
+			// grouped collection_items array
+			$grouped = array();
+			//$collection_items = $collection['CollectionItems'];
+			
+			// iterate through the collection items
+			foreach ($collection_items as $item) {
+			
+				// iterate through the collection groups (z.B. key = Region|City)
+				foreach ($groups as $key => $iter) {
+				
+					// if this group doesn't exist yet, create it
+					if (!isset($groups[$key]['Groups'])) {
+						$groups[$key]['Groups'] = array();
+					}
 
-		if (!empty($collection_items)) {
-			Cache::write('collection_items_' . $collection_id, $collection_items, 'long');
-		} else {
-			Cache::delete('collection_items_' . $collection_id);
+					if (isset($item['CollectionItemField'][$key])) {
+					
+						// if this collection item has a field with the current group key, it should be placed in a grouped array named by the value of the field
+						$group_key = $item['CollectionItemField'][$key]['value'];
+						
+					} else {
+
+						// if the collection item does not have a field with the current group key, it should be placed in a ungrouped array
+						$group_key = 'UNGROUPED';
+					}
+
+					// if an array with the group key value does not yet exist, create it
+					if (!isset($groups[$key]['Groups'][$group_key])) {
+						$groups[$key]['Groups'][$group_key] = array();
+					}
+
+					array_push($groups[$key]['Groups'][$group_key], $item);
+				}
+			}
+
+			// sort the entries in the groups
+			foreach ($groups as $key => $iter) {
+				$tmp = $iter['Groups'];
+				ksort($tmp);
+				$groups[$key]['Groups'] = $tmp;
+			}
 		}
 		
-		$event = new CakeEvent('CollectionItemList.change.on.' . $collection_id, $this, array());
-		CakeEventManager::instance()->dispatch($event);
-		
-		return $collection_items;
+		//var_dump($collection_items);var_dump($groups);die;
+
+		return array("Ungrouped" => $collection_items, "Grouped" => $groups);
 	}
 	
 	// CREATE
@@ -121,10 +131,7 @@ class CollectionItem extends AppModel {
             if ($this->saveAll($data)) {
 				$collection_item_id = $this->id;	
 				$data['CollectionItem']['id'] = $collection_item_id;
-				
-				$this->cacheListByCollectionID($data['CollectionItem']['collection_id']);
-				$this->cacheByID($data['CollectionItem']['id']);
-				
+								
 				return $data;
 			}
 
@@ -139,9 +146,6 @@ class CollectionItem extends AppModel {
 	public function updateCollectionItem ($data) {
 		if ($this->saveAll($data)) {
 		
-			$this->cacheListByCollectionID($data['CollectionItem']['collection_id']);
-			$this->cacheByID($data['CollectionItem']['id']);
-		
 			return $data	;
 		}
 		
@@ -151,9 +155,6 @@ class CollectionItem extends AppModel {
 	// DELETE
 	public function deleteCollectionItem ($collection_item_id) {
 		if ($this->delete($collection_item_id, true)) {
-			
-			$this->cacheListByCollectionID($data['CollectionItem']['collection_id']);
-			$this->cacheByID($data['CollectionItem']['id']);
 			
 			return true;
 		}

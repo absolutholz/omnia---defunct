@@ -55,22 +55,8 @@ class Participation extends AppModel {
 	 * Get a list of collections (w/ participation information) for the passed user id.
 	 */
 	public function getByUserID ($user_id) {
-		$collections = Cache::read('participations_user_' . $user_id, 'long');
-
-        if (empty($collections)) {
-			$collections = $this->cacheByUserID($user_id);
-		}
-		
-		return $collections;
-	}
-	/**
-	 * Cache the list of collections for the passed user id.
-	 */
-	public function cacheByUserID ($user_id) {
 		$collections = $this->find('all', array("contain" => 'Collection', "conditions" => array("Participation.user_id" => $user_id)));
 		$collections = Hash::combine($collections, '{n}.Collection.id', '{n}');
-
-		Cache::write('participations_user_' . $user_id, $collections, 'long');
 		
 		return $collections;
 	}
@@ -79,48 +65,20 @@ class Participation extends AppModel {
 	 * Get a list of collections (w/ participation information) for the passed collection id.
 	 */
 	public function getByCollectionID ($collection_id) {
-		$participants = Cache::read('participtions_' . $collection_id, 'long');
-
-        if (empty($participants)) {
-			$participants = $this->cacheByCollectionID($collection_id);
-		}
-		
-		return $participants;
-	}	
-	/**
-	 * Cache the list of collections for the passed collection id.
-	 */	
-	public function cacheByCollectionID ($collection_id) {
 		$participants = $this->find('all', array("contain" => 'User', "conditions" => array("Participation.collection_id" => $collection_id, "Participation.visibility_id" => 1)));
 		$participants = Hash::combine($participants, '{n}.User.id', '{n}');
-		
-		Cache::write('participtions_' . $collection_id, $participants, 'long');
 		
 		return $participants;
 	}	
 	
 	/**
-	 * Reset the cache for a certain collection and for all users of it.
+	 * Participate
 	 */
-	public function recacheByCollectionID ($collection_id) {
-		// reset the participation cache for this collection
-		$participations = $this->cacheByCollectionID($collection_id);
-		// reset the participation cache for any users
-				var_dump($participations);
-
-		foreach ($participations as $participation) {
-			$this->cacheByUserID($participation['Participation']['user_id']);
-		}
-	}
-
 	public function createParticipation ($collection_id, $user_id, $visibility_id = 1) {
 		if ($this->User->isValid($user_id) && $this->Collection->isValid($collection_id)) {
 			$this->create();
 			$this->save(array("collection_id" => $collection_id, "user_id" => $user_id, "visibility_id" => $visibility_id));
-			
-			$this->cacheByUserID($user_id);
-			$this->cacheByCollectionID($collection_id);
-
+		
 			return true;
 		
 		} else {
@@ -130,6 +88,9 @@ class Participation extends AppModel {
 		return false;
 	}
 	
+	/**
+	 * Unparticipate
+	 */
 	public function deleteParticipation ($participation_id) {
 		if (!$participation_id) {
 			throw new NotFoundException(__('Invalid Participation'));
@@ -139,11 +100,5 @@ class Participation extends AppModel {
 
 		}
 	}
-	
-	// READ
-	public function getByID ($participation_id) {
-		return $this->find('first', array("conditions" => array("Participation.id" => $participation_id)));
-	}
-	
 }
 ?>

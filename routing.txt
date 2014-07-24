@@ -1,0 +1,41 @@
+Routing
+
+/ - list of public collections & participations for logged in user
+	/login - user login
+	/logout - user logout
+	/search - search collections, collection items, & collection item fields
+	/create - create new collection
+
+***** COLLECTION *****	
+/[collection_id] - collection details and list of (ungrouped) collection items
+	/group/[grouping_id]
+		/[open_group_id]
+	/edit
+		/fields
+			/create
+			/[field_id]/edit
+			/[field_id]/delete
+	/delete
+	/addto - create collection item and add it to collection
+	/participate
+	/unparticipate
+
+	***** COLLECTION ITEM *****
+	/[collection_item_id]
+		/edit
+		/delete
+		/available/[status_id]
+		/complete/[status_id]
+	
+***** USER MGMT *****
+/users - list of publicly visible users
+	/create
+	/[user_id] - user details and list of user's publicly visible participations
+		/edit
+		/delete
+		/[collection_id] - view user's participation for particular collection
+			/participate
+			/unparticipate
+		/[collection_id]/[collection_item_id] - view user's participation for particular collection item
+			/available/[status_id]
+			/complete/[status_id]

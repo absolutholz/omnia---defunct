@@ -54,6 +54,8 @@
 	Router::connect('/:collection_id/delete', array("controller" => 'collections', "action" => 'delete'), array("pass" => array('collection_id')));
 	Router::connect('/:collection_id/participate', array("controller" => 'collections', "action" => 'participate'), array("pass" => array('collection_id')));
 	Router::connect('/:collection_id/unparticipate/:participation_id', array("controller" => 'collections', "action" => 'unparticipate'), array("pass" => array('collection_id', 'participation_id')));
+	Router::connect('/:collection_id/grouped/:grouped_by_id', array("controller" => 'collections', "action" => 'view', "grouped_by_id" => null), array("pass" => array('collection_id', 'grouped_by_id')));
+	Router::connect('/:collection_id/grouped/:grouped_by_id/:open_group_id', array("controller" => 'collections', "action" => 'view', "grouped_by_id" => null, "open_group_id" => null), array("pass" => array('collection_id', 'grouped_by_id', 'open_group_id')));
 	
 	// COLLECTION ITEMS
 	Router::connect('/:collection_id/add', array("controller" => 'collection_items', "action" => 'add'), array("pass" => array('collection_id')));

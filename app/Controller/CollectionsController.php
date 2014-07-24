@@ -42,49 +42,33 @@ class CollectionsController extends AppController {
 	 * Show the collection items for the passed collection_id.
 	 * TODO: grouping
 	 */
-    public function view ($collection_id) {
-		$user_id = $this->Auth->user('id');
-
+    public function view ($collection_id, $grouped_by_id = null, $open_group_id = null) {
 		$collection = $this->Collection->getByID($collection_id);
-
-		$groups = $this->Field->getGroupsByCollectionID($collection_id);
-
-		$grouped = array();
-		$collection_items = $collection['CollectionItems'];
-		foreach ($collection_items as $item) {
-			foreach ($groups as $key => $iter) {
-				if (!isset($groups[$key]['Groups'])) {
-					$groups[$key]['Groups'] = array();
-				}
-
-				if (isset($item['CollectionItemField'][$key])) {
-					$group_key = $item['CollectionItemField'][$key]['value'];
-				} else {
-					$group_key = 'UNGROUPED';
-				}
-
-				if (!isset($groups[$key]['Groups'][$group_key])) {
-					$groups[$key]['Groups'][$group_key] = array();
-				}
-
-				array_push($groups[$key]['Groups'][$group_key], $item);
-			}
-		}
-
-		foreach ($groups as $key => $iter) {
-			$tmp = $iter['Groups'];
-			ksort($tmp);
-			$groups[$key]['Groups'] = $tmp;
+		
+		if (empty($open_group_id)) {
+			
 		}
 		
+		// TODO
 		$participation = null;
 
+		// if the logged in user is in the list of participants, remove him from it
+		$user_id = $this->Auth->user('id');
 		if (isset($collection['Participations'][$user_id])) {
 			$participation = $collection['Participations'][$user_id];
 			unset($collection['Participations'][$user_id]);
 			$this->set('completions', $this->Completion->getCompletionsByParticipationID($participation['Participation']['id']));
 		}
+
+		if (!empty($grouped_by_id)) {
+			$collection['CollectionItems'] = $collection['CollectionItems']['Grouped'][$grouped_by_id];
+		} else {
+			$collection['CollectionItems'] = $collection['CollectionItems']['Ungrouped'];
+		}
+		
 		$this->set('collection', $collection);
+		$this->set('grouped_by_id', $grouped_by_id);
+		$this->set('open_group_id', $open_group_id);
 		$this->set('participation', $participation);
 	}	
 	
