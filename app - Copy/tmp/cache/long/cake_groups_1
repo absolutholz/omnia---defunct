@@ -1,0 +1,2 @@
+1413908120
+a:2:{i:9;a:1:{s:5:"Field";a:7:{s:2:"id";s:1:"9";s:4:"name";s:6:"Region";s:6:"values";s:87:"Mittelfranken, Niederbayern, Oberbayern, Oberfranken, Oberpfalz, Schwaben, Unterfranken";s:12:"is_groupable";b:1;s:11:"is_required";b:1;s:13:"field_type_id";s:1:"1";s:13:"collection_id";s:1:"1";}}i:11;a:1:{s:5:"Field";a:7:{s:2:"id";s:2:"11";s:4:"name";s:4:"City";s:6:"values";s:0:"";s:12:"is_groupable";b:1;s:11:"is_required";b:1;s:13:"field_type_id";s:1:"1";s:13:"collection_id";s:1:"1";}}}

@@ -4,7 +4,7 @@ Routing
 	/login - user login
 	/logout - user logout
 	/search - search collections, collection items, & collection item fields
-	/create - create new collection
+	/new - create new collection
 
 ***** COLLECTION *****	
 /[collection_id] - collection details and list of (ungrouped) collection items
@@ -12,14 +12,15 @@ Routing
 		/[open_group_id]
 	/edit
 		/fields
-			/create
+			/new
 			/[field_id]/edit
 			/[field_id]/delete
 	/delete
 	/addto - create collection item and add it to collection
 	/participate
-	/unparticipate
-
+	/unparticipate/[participation_id] - participation_id is optional ... if omitted, use the logged in user and collection_id
+	/search - search within specific collection
+	
 	***** COLLECTION ITEM *****
 	/[collection_item_id]
 		/edit
@@ -29,13 +30,12 @@ Routing
 	
 ***** USER MGMT *****
 /users - list of publicly visible users
-	/create
+	/new
+	/search - search within users
 	/[user_id] - user details and list of user's publicly visible participations
 		/edit
 		/delete
 		/[collection_id] - view user's participation for particular collection
-			/participate
-			/unparticipate
-		/[collection_id]/[collection_item_id] - view user's participation for particular collection item
-			/available/[status_id]
-			/complete/[status_id]
+			/group/[grouping_id]
+				/[open_group_id]
+			/[collection_item_id] - view user's participation for particular collection item
